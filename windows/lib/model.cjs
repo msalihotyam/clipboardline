@@ -353,6 +353,7 @@ class Store {
       item.name ||= matching.find(i => i.name)?.name || '';
       item.note ||= matching.find(i => i.note)?.note || '';
       const dates=matching.map(i=>i.retainedAt).filter(Number.isFinite);if(dates.length)item.retainedAt=Math.min(...dates);
+      const copied=matching.map(i=>i.lastCopiedAt).filter(Number.isFinite);if(copied.length)item.lastCopiedAt=Math.max(...copied);
     }
     this.data.items = [item, ...this.data.items.filter(i => i.id !== item.id && !matching.includes(i))];
     this.expire(false); this.persist(); return item;
