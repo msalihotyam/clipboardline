@@ -29,10 +29,13 @@ versioned behavioral specification. Its synthetic items use portable aliases and
 are listed newest first. Every step contains an expected active row, focused
 item, complete selection, visible rows and native search-editing state.
 
-The current eleven scenarios (62 observations per platform) cover one selected image on opening, reopening,
+The current fourteen scenarios (86 observations per platform) cover one selected image on opening, reopening,
 hidden/empty/filtered image fallback, column-preserving vertical navigation and
 clamping, hidden/empty row skipping, horizontal navigation, adding and hiding
-rows, search caret keys, empty shelves, remapping, disabling and restoring defaults.
+rows, search caret keys, empty shelves, remapping, disabling and restoring defaults,
+and Enter, S, P, Space and Ctrl/Command+C doing nothing on an empty active shelf
+while other shelves hold items (`command` steps also observe their `effects`:
+any copy, preview, pin or take down; the expected list is empty).
 A future user-visible change must add
 or amend the relevant scenarios and both adapters in the same change. Extend the
 contract's scope as the product grows; passing the current shelf scenarios is not
@@ -48,6 +51,10 @@ renderer test that runs the shipped export through the Export shortcut.
 details panel to show the count with the localized `%d selected` entry. The
 Windows folder picker uses the same entry; the macOS folder picker keeps its own
 `Pin %d items to a folder` heading.
+`link-title-charset` requires a fetched page title to be decoded with the page's
+declared character set (byte-order mark, `Content-Type`, XHTML declaration, early
+`<meta charset>`), falling back to windows-1252, so windows-1254 pages show their
+Turkish letters.
 `item-name-validation` requires Name and pin to accept a trimmed name of 1-160
 characters and at most 1024 UTF-8 bytes without control or line/paragraph
 separators, and to reject anything else with `Enter a name (1–160 characters)`.
