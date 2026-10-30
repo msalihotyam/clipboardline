@@ -208,7 +208,8 @@ class Store {
     if (!width || !height || width * height > 80_000_000) fail('Image is too large');
     const filename = crypto.createHash('sha256').update(buffer).digest('hex') + '.png';
     const destination = path.join(this.mediaDirectory, filename);
-    if (!fs.existsSync(destination)) fs.writeFileSync(destination, buffer, {flag: 'wx', mode: 0o600});
+    // Write beside the target and rename, so a failed or interrupted write never leaves a truncated file under the content hash.
+    if (!fs.existsSync(destination) || fs.statSync(destination).size !== buffer.length) {const temporary = path.join(this.mediaDirectory, '.png-' + crypto.randomUUID());try {fs.writeFileSync(temporary, buffer, {flag: 'wx', mode: 0o600});fs.renameSync(temporary, destination);} finally {fs.rmSync(temporary, {force: true});}}
     return filename;
   }
   mediaPath(id, original = false) {

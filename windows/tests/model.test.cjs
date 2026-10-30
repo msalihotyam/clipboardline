@@ -17,6 +17,12 @@ test('sibling folder names are unique ignoring case and diacritics like macOS',(
  const other=s.modify('createFolder',{name:'Personal'});assert.throws(()=>s.modify('renameFolder',{id:other.id,name:'WORK'}),/already exists/);assert.equal(s.data.folders.find(folder=>folder.id===other.id).name,'Personal');
  s.modify('renameFolder',{id:work.id,name:'work'});assert.equal(s.data.folders.find(folder=>folder.id===work.id).name,'work');
 }));
+test('a failed PNG write never leaves a truncated file under the content hash',()=>fixture(s=>{
+ const original=fs.writeFileSync;let failed=false;
+ fs.writeFileSync=function(target,data,...rest){if(!failed&&typeof target==='string'&&target.startsWith(s.mediaDirectory)){failed=true;original.call(fs,target,data.subarray(0,10),...rest);throw Object.assign(new Error('synthetic disk full'),{code:'ENOSPC'});}return original.call(fs,target,data,...rest);};
+ try{assert.throws(()=>s.insert('image',png),/disk full/);}finally{fs.writeFileSync=original;}
+ const item=s.insert('image',png);assert.deepEqual(fs.readFileSync(s.mediaPath(item.id)),png);assert.deepEqual(fs.readdirSync(s.mediaDirectory),[item.imageFile]);
+}));
 test('retention is per-kind; pinned/folder/tag records remain permanent',()=>fixture((s,time)=>{const text=s.insert('text','expiring text'),link=s.insert('link','https://example.com'),saved=s.insert('text','tagged');s.modify('tag',{ids:[saved.id],tags:['keep']});s.modify('setSettings',{patch:{retentionDays:{text:1,link:3,image:0}}});time(2*86400000);s.expire();assert.ok(text.trashedAt);assert.equal(link.trashedAt,null);assert.equal(saved.trashedAt,null);}));
 test('remove hides saved items, trashes temporary ones; undo preserves later edits',()=>fixture(s=>{const saved=s.insert('text','saved'),temp=s.insert('text','temporary');s.modify('pin',{ids:[saved.id]});s.modify('remove',{ids:[saved.id,temp.id]});assert.equal(saved.hiddenFromShelf,true);assert.ok(temp.trashedAt);s.modify('name',{id:saved.id,name:'Later name'});s.modify('undo');assert.equal(saved.hiddenFromShelf,false);assert.equal(temp.trashedAt,null);assert.equal(saved.name,'Later name');}));
 test('explicit Trash invalidates removal undo and deletion requires Trash',()=>fixture(s=>{const item=s.insert('text','text');assert.throws(()=>s.modify('delete',{ids:[item.id]}));s.modify('remove',{ids:[item.id]});s.modify('restore',{ids:[item.id]});assert.equal(s.undoStack.length,0);s.modify('trash',{ids:[item.id]});s.modify('delete',{ids:[item.id]});assert.equal(s.data.items.length,0);}));
