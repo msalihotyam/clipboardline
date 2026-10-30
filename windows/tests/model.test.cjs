@@ -153,3 +153,12 @@ test('selection lookups keep request order and reject missing items',()=>fixture
  assert.throws(()=>s.selected([first.id,'00000000-0000-4000-8000-000000000000']),/no longer exists/);
  s.modify('trash',{ids:[first.id]});s.modify('delete',{ids:[first.id]});assert.deepEqual(s.data.items.map(item=>item.id),[second.id]);
 }));
+test('opening the Store removes stale .png-/.video- temporaries from a killed process and leaves everything else',()=>fixture((s,_time,dir)=>{
+ const id='0f8fad5b-d9cb-469f-a165-70867728950e',media=s.mediaDirectory,stale=['.png-'+id,'.video-'+id],keep=['.png-'+id+'.x','.png-nope','x.png-'+id,'.video-'+id.slice(1)];
+ for(const name of [...stale,...keep])fs.writeFileSync(path.join(media,name),'x');
+ const dirLike='.png-'+id.replace(/^0/,'1');fs.mkdirSync(path.join(media,dirLike));fs.writeFileSync(path.join(media,dirLike,'inner'),'x');
+ let link='';try{fs.symlinkSync(path.join(dir,'library.json'),path.join(media,link='.video-'+id.replace(/^0/,'2')));}catch{link='';}
+ const item=s.insert('image',png),reopened=new Store(dir);
+ assert.deepEqual(fs.readdirSync(media).sort(),[...keep,dirLike,...(link?[link]:[]),item.imageFile].sort());
+ assert.ok(fs.existsSync(path.join(media,dirLike,'inner')));assert.deepEqual(fs.readFileSync(reopened.mediaPath(item.id)),png);
+}));
