@@ -44,6 +44,10 @@ entry missing either platform. `localized-notices` requires notices and the
 shortcut-conflict message to follow the selected language, including refilled
 templates such as `Exported %d · failed %d`. Its Windows evidence is the
 renderer test that runs the shipped export through the Export shortcut.
+`localized-selection-count` requires the Library footer and the multi-selection
+details panel to show the count with the localized `%d selected` entry. The
+Windows folder picker uses the same entry; the macOS folder picker keeps its own
+`Pin %d items to a folder` heading.
 `item-name-validation` requires Name and pin to accept a trimmed name of 1-160
 characters and at most 1024 UTF-8 bytes without control or line/paragraph
 separators, and to reject anything else with `Enter a name (1–160 characters)`.
