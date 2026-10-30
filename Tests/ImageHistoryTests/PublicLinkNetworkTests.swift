@@ -123,6 +123,9 @@ import XCTest
         // Bidirectional embeddings, overrides and isolates can reorder a title to spoof another one: dropped raw or as references.
         XCTAssertEqual(try title("<title>invoice\u{202E}fdp.exe \u{2066}x\u{2069}</title>"), "invoicefdp.exe x")
         XCTAssertEqual(try title("<title>a&#x202E;b&#8294;c&#x2069;</title>"), "abc")
+        // The implicit LRM, RLM and ALM marks reorder neighbouring text the same way; uppercase hex references decode like lowercase.
+        XCTAssertEqual(try title("<title>a\u{200E}b\u{200F}c\u{061C}d&#x200E;e&#8207;f&#x61C;g</title>"), "abcdefg")
+        XCTAssertEqual(try title("<title>x&#X200D;y&#X200C;z</title>"), "x\u{200D}y\u{200C}z")
         XCTAssertEqual(try title("<meta property='og:title' content='\u{202A}\u{202B}\u{202C}\u{202D}x\u{2067}\u{2068}'>"), "x")
         XCTAssertEqual(try parsed("<meta name=author content='Wri\u{202E}ter'>").author, "Writer")
     }

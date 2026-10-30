@@ -44,6 +44,8 @@ test('metadata titles keep joiners but drop bidirectional overrides, raw or as n
  assert.equal(await title('<title>&#x1F468;&#x200D;&#x1F4BB; dev&#8204;x</title>'),'\u{1F468}\u200D\u{1F4BB} dev\u200Cx');
  assert.equal(await title('<title>invoice\u202Efdp.exe \u2066x\u2069</title>'),'invoicefdp.exe x');
  assert.equal(await title('<title>a&#x202E;b&#8294;c&#x2069;</title>'),'abc');
+ assert.equal(await title('<title>a\u200Eb\u200Fc\u061Cd&#x200E;e&#8207;f&#x61C;g</title>'),'abcdefg');
+ assert.equal(await title('<title>x&#X200D;y&#X200C;z</title>'),'x\u200Dy\u200Cz');
  assert.equal(await title('<meta property="og:title" content="\u202A\u202B\u202C\u202D x\u2067\u2068">'),'x');
 });
 test('og:title whitespace collapses without rewriting the og:image URL',async()=>{
