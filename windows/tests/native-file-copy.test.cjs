@@ -28,7 +28,7 @@ test('every native helper decodes its UTF-8 JSON stdin as UTF-8', async () => {
     const jobs = new MediaJobs({directory: path.join(directory, 'jobs')});
     // A mangled path fails the helper's existence check at the Input stage;
     // the correct path reaches the (invalid) media decoder instead.
-    await assert.rejects(jobs.probe(source), error => error.stage !== 'Input');
+    await assert.rejects(jobs.probe(source), {code: 'MEDIA_UNSUPPORTED_OR_FAILED', stage: 'Decode'});
     jobs.dispose();
   } finally { fs.rmSync(directory, {recursive: true, force: true}); }
 });
