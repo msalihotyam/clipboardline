@@ -59,6 +59,8 @@ Turkish letters.
 selection of pinned and unpinned items to pin all of them, and to unpin only
 when every selected item is already pinned; the Library keyboard contract executes
 this on both platforms with an image, a text and a link selected.
+`subfolder-title` requires the Library title of a subfolder to read
+`Parent / Child`, so same-named subfolders can be told apart.
 `link-title-format-characters` requires a fetched page title to keep the
 zero-width joiner and non-joiner (emoji sequences, Persian words) while removing
 the bidirectional marks, embeddings, overrides and isolates that can spoof a title,

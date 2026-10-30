@@ -195,6 +195,20 @@ import XCTest
         _ = model.select(record.id); model.trash(); wait { model.ids.isEmpty && !model.loading }
         XCTAssertNil(model.inspected); XCTAssertTrue(model.selectedIDs.isEmpty)
     }
+    func testSubfolderTitleIncludesItsParentLikeWindows() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
+        let parent = try store.createCollection("Parent"), middle = try store.createCollection("Middle", parent: parent)
+        let child = UUID()  // createCollection allows two levels only, so insert the third level (e.g. from imported data) directly
+        try LibraryDatabase(url: store.databaseURL).execute("INSERT INTO collections VALUES(?,?,?,?)", [.text(child.uuidString), .text("Child"), .text(middle.uuidString), .text("Child".libraryFolded)])
+        let model = LibraryModel(store: store)
+        wait { model.collections.count == 3 && !model.loading }
+        model.changeScope(.collection(parent)); wait { model.query.scope == .collection(parent) && !model.loading }
+        XCTAssertEqual(model.title, "Parent")
+        model.changeScope(.collection(child)); wait { model.query.scope == .collection(child) && !model.loading }
+        XCTAssertEqual(model.title, "Parent / Middle / Child")
+        model.changeScope(.collection(middle)); wait { model.query.scope == .collection(middle) && !model.loading }
+        XCTAssertEqual(model.title, "Parent / Middle")
+    }
     func testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows() throws {
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
         let records = try ["first trashed note", "second trashed note", "third trashed note"].map { try XCTUnwrap(store.captureText($0)) }
