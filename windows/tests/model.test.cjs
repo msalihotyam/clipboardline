@@ -174,3 +174,8 @@ test('Name and pin follows macOS nameAndPin: 1-160 characters, 1024 bytes, no co
  s.modify('name',{id,name:'  '+'é'.repeat(80)+'  '});assert.equal(s.item(id).name,'é'.repeat(80));assert.equal(s.item(id).pinned,true);
  s.modify('name',{id,name:'x'.repeat(160)});s.modify('name',{id,name:'\u{1F600}'.repeat(160)});assert.equal(s.item(id).name.length,320);
 }));
+test('pin on a mixed selection pins every item and only a fully pinned selection unpins like macOS',()=>fixture(s=>{
+ const a=s.insert('text','first pin'),b=s.insert('text','second pin'),pinned=()=>[a,b].map(value=>s.item(value.id).pinned);
+ s.modify('pin',{ids:[a.id]});s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[true,true]);
+ s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[false,false]);
+}));
