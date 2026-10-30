@@ -100,6 +100,14 @@ function plainURL(value) {
   try { const u = new URL(value); return ['http:', 'https:'].includes(u.protocol) && !u.username && !u.password ? u.href : null; } catch { return null; }
 }
 
+// Match macOS LinkIdentity.normalized: utm_*, fbclid and gclid (any case) do not make a different link.
+function linkIdentity(href) {
+  try {
+    const u = new URL(href), drop = part => { const name = part.split('=')[0]; let decoded = name; try { decoded = decodeURIComponent(name); } catch {} return /^utm_/i.test(decoded) || /^(fbclid|gclid)$/i.test(decoded); };
+    u.search = u.search.slice(1).split('&').filter(part => !drop(part)).join('&'); return u.href;
+  } catch { return href; }
+}
+
 // A cold PowerShell start can exceed 15 seconds on a busy machine, for example
 // while antivirus scans it. The script is idempotent, so retry only a timed-out
 // attempt once with a longer limit before refusing to open the library.
@@ -306,7 +314,7 @@ class Store {
     else textValue = text(value);
     const identity=kind==='text'?textIdentity(textValue):null;
     const matching = this.data.items.filter(i => i.kind === kind && !i.trashedAt &&
-      (kind === 'text' ? this.textIdentity(i) === identity : kind === 'link' ? i.url === url : !i.recording&&i.imageFile === imageFile));
+      (kind === 'text' ? this.textIdentity(i) === identity : kind === 'link' ? linkIdentity(i.url) === linkIdentity(url) : !i.recording&&i.imageFile === imageFile));
     const prior = matching.sort((a, b) => b.updatedAt - a.updatedAt)[0];
     if(!prior&&this.data.items.length>=20000){
       if(kind==='image'){

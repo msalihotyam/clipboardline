@@ -46,6 +46,12 @@
         "behavior": "A fetched page title and Open Graph text are decoded with the page's declared character set, in this order: UTF-8 byte-order mark, Content-Type charset, XML declaration (XHTML only), early meta charset; unknown labels are skipped, a meta UTF-16 label means UTF-8, and undeclared bytes that are not UTF-8 are windows-1252, so older windows-1254 / ISO-8859-9 pages show their Turkish letters.",
         "macos": "PublicLinkHTMLMetadata.decode follows that order with CoreFoundation IANA names; PublicLinkNetworkTests.testHTMLHonorsDeclaredMetaCharsetAndFallsBackToWindows1252 covers it.",
         "windows": "decodeHTML in lib/network.cjs follows that order with TextDecoder; security.test.cjs covers it."
+      },
+      {
+        "id": "link-tracking-parameters",
+        "behavior": "Copying a link again that differs only by tracking query parameters (names starting with utm_, fbclid or gclid, in any letter case) is the same item: it is refreshed and keeps its first stored address, and links whose other parameters or fragment differ stay separate.",
+        "macos": "LinkIdentity.normalized drops those parameters before LibraryStore.captureLink matches an existing item; LibraryStoreTests.testLinkIdentityPreservesMeaningfulParametersAndDeduplicatesVideoForms covers it.",
+        "windows": "linkIdentity in lib/model.cjs applies the same rule when Store.insert matches an existing link; model.test.cjs covers it."
       }
     ]
   },

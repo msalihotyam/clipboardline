@@ -55,6 +55,9 @@ Windows folder picker uses the same entry; the macOS folder picker keeps its own
 declared character set (byte-order mark, `Content-Type`, XHTML declaration, early
 `<meta charset>`), falling back to windows-1252, so windows-1254 pages show their
 Turkish letters.
+`link-tracking-parameters` requires a link copied again with different `utm_*`,
+`fbclid` or `gclid` parameters to be the same item, keeping its first stored address,
+while any other query parameter or fragment makes a separate item.
 
 The adapters execute application behavior:
 
