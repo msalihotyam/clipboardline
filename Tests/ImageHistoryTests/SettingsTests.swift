@@ -106,5 +106,6 @@ import XCTest
         defaults.set([unmounted.path], forKey: "extraFolders")
         AppDelegate.extraFolders.append(present)
         XCTAssertEqual(defaults.stringArray(forKey: "extraFolders") ?? [], [unmounted.path, present.path])
+        XCTAssertEqual(AppDelegate.existingExtraFolders.map(\.path), [present.path])
     }
 }

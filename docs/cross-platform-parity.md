@@ -64,6 +64,9 @@ this on both platforms with an image, a text and a link selected.
 `trash-restore-selection` requires restoring items from Library Trash to move
 focus and selection to the first item that remains in Trash and to clear the
 details panel when none remain.
+`unavailable-watched-folder` requires a watched folder that is unavailable, such as one on an
+unmounted volume, to stay in the saved list while it is skipped, so adding or removing another
+watched folder does not forget it.
 
 The adapters execute application behavior:
 
