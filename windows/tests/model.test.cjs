@@ -189,6 +189,14 @@ test('old duplicate links whose names or notes differ are not merged, so none of
   assert.deepEqual(s.data.items.filter(i=>i.kind==='link').map(i=>i.id).sort(),[newest.id,home.id].sort());
   assert.deepEqual([home.name,home.note,home.url],['Home','other note','https://example.com/a?id=7']);}
 }));
+test('link preview metadata stores its thumbnail only while the link still exists',()=>fixture((s,time,dir)=>{
+ const files=()=>fs.readdirSync(path.join(dir,'media')),url='https://example.com/a';
+ const gone=s.insert('link',url);s.modify('trash',{ids:[gone.id]});assert.equal(s.setLinkMetadata(gone,url,{title:'T',thumbnail:png}),false);assert.deepEqual(files(),[]);assert.equal(gone.title,'');
+ const deleted=s.insert('link','https://example.com/b');s.modify('trash',{ids:[deleted.id]});s.modify('delete',{ids:[deleted.id]});assert.equal(s.setLinkMetadata(deleted,deleted.url,{title:'T',thumbnail:png}),false);assert.deepEqual(files(),[]);
+ const live=s.insert('link','https://example.com/c');assert.equal(s.setLinkMetadata(live,live.url,{title:'Title',author:'Writer',thumbnail:png}),true);
+ assert.equal(live.title,'Title');assert.equal(live.author,'Writer');assert.deepEqual(files(),[live.thumbnailFile]);
+ assert.equal(s.setLinkMetadata(live,'https://example.com/other',{title:'X'}),false);assert.equal(live.title,'Title');
+}));
 test('pin on a mixed selection pins every item and only a fully pinned selection unpins like macOS',()=>fixture(s=>{
  const a=s.insert('text','first pin'),b=s.insert('text','second pin'),pinned=()=>[a,b].map(value=>s.item(value.id).pinned);
  s.modify('pin',{ids:[a.id]});s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[true,true]);

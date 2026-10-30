@@ -66,6 +66,9 @@ run the `tracking-parameter-links` scenario.
 selection of pinned and unpinned items to pin all of them, and to unpin only
 when every selected item is already pinned; the Library keyboard contract executes
 this on both platforms with an image, a text and a link selected.
+`trash-restore-selection` requires restoring items from Library Trash to move
+focus and selection to the first item that remains in Trash and to clear the
+details panel when none remain.
 
 The adapters execute application behavior:
 
