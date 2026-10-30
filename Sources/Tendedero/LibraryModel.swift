@@ -240,6 +240,9 @@ import Combine
             let folders = try store.collections(), labels = try store.tags()
             if collections != folders { collections = folders }
             if tags != labels { tags = labels }
+            // A removed tag would stay as a filter with no chip, hiding every item.
+            let live = Set(labels.map(\.id))
+            if !query.tagIDs.isSubset(of: live) { query.tagIDs.formIntersection(live) }
         } catch { notice = error.localizedDescription }
         store.resolveImageSearch(query) { [weak self] resolved in
           guard let self, generation == self.queryGeneration else { return }
@@ -394,7 +397,14 @@ import Combine
             if !loading { finishKeyboardSelection() }
         } catch { report(error.localizedDescription) }
     }
-    func restore() { perform { try store.restore(actionIDs) } }
+    func restore() {
+        let targets = actionIDs
+        guard !targets.isEmpty else { return }
+        // The restored items leave Trash: select the first one that remains, as Windows does.
+        if query.scope == .trash { pendingKeyboardSelection = (nil, query) }
+        do { try store.restore(targets) }
+        catch { pendingKeyboardSelection = nil; report(error.localizedDescription) }
+    }
     func assign(_ folder: UUID, moving: Bool = false) {
         guard flushEdits() else { return }
         var source: UUID?; if moving, case let .collection(id) = query.scope { source = id }
