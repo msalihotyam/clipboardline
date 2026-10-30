@@ -174,6 +174,21 @@ test('links differing only by tracking parameters share one item like macOS Link
  assert.notEqual(s.insert('link','https://example.com/a?id=8').id,first.id);assert.notEqual(s.insert('link','https://example.com/a?id=7&ref=x').id,first.id);assert.notEqual(s.insert('link','https://example.com/a?id=7#top').id,first.id);
  assert.equal(s.insert('link','https://example.com/?utm_source=x').id,s.insert('link','https://example.com/').id);assert.equal(s.data.items.length,5);
 }));
+test('old duplicate links that differ only by tracking parameters merge on the next copy and keep the first stored address, names and notes',()=>fixture((s,time)=>{
+ const old=(url,createdAt,fields)=>Object.assign(s.insert('link','https://example.com/seed-'+s.data.items.length),{url,createdAt,updatedAt:createdAt,...fields});
+ const first=old('https://example.com/a?utm_source=x',1000,{name:'Reading list',pinned:true}),second=old('https://example.com/a',2000,{note:'from a friend',tags:['later']}),newest=old('https://example.com/a?fbclid=z',3000,{});
+ time(5000);const copy=s.insert('link','https://example.com/a?gclid=q');
+ assert.equal(copy.id,newest.id);assert.deepEqual(s.data.items.filter(i=>i.kind==='link').map(i=>i.id),[newest.id]);
+ assert.equal(copy.url,first.url);assert.equal(copy.name,'Reading list');assert.equal(copy.note,'from a friend');assert.deepEqual(copy.tags,['later']);assert.equal(copy.pinned,true);
+}));
+test('old duplicate links whose names or notes differ are not merged, so none of them is lost',()=>fixture((s,time)=>{
+ const old=(url,createdAt,fields)=>Object.assign(s.insert('link','https://example.com/seed-'+s.data.items.length),{url,createdAt,updatedAt:createdAt,...fields});
+ const work=old('https://example.com/a?id=7&utm_source=x',1000,{name:'Work',note:'shared note'}),home=old('https://example.com/a?id=7',2000,{name:'Home',note:'other note'}),newest=old('https://example.com/a?id=7&utm_campaign=y',3000,{note:'shared note'});
+ for(const at of [5000,6000]){time(at);const copy=s.insert('link','https://example.com/a?id=7&gclid=q');
+  assert.equal(copy.id,newest.id);assert.deepEqual([copy.name,copy.note,copy.url],['Work','shared note',work.url]);
+  assert.deepEqual(s.data.items.filter(i=>i.kind==='link').map(i=>i.id).sort(),[newest.id,home.id].sort());
+  assert.deepEqual([home.name,home.note,home.url],['Home','other note','https://example.com/a?id=7']);}
+}));
 test('pin on a mixed selection pins every item and only a fully pinned selection unpins like macOS',()=>fixture(s=>{
  const a=s.insert('text','first pin'),b=s.insert('text','second pin'),pinned=()=>[a,b].map(value=>s.item(value.id).pinned);
  s.modify('pin',{ids:[a.id]});s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[true,true]);

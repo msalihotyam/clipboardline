@@ -316,6 +316,18 @@ class Store {
     const matching = this.data.items.filter(i => i.kind === kind && !i.trashedAt &&
       (kind === 'text' ? this.textIdentity(i) === identity : kind === 'link' ? linkIdentity(i.url) === linkIdentity(url) : !i.recording&&i.imageFile === imageFile));
     const prior = matching.sort((a, b) => b.updatedAt - a.updatedAt)[0];
+    if (kind === 'link' && matching.length > 1) {
+      // Libraries made before tracking parameters were ignored can hold several of these. Merge only the ones whose name and note do not clash with the kept
+      // item's (macOS never deletes them); the others stay as they are. The merged item keeps the address of the oldest copy.
+      let name = prior.name, note = prior.note;
+      const merged = [prior];
+      for (const other of matching.slice(1)) {
+        if ((other.name && name && other.name !== name) || (other.note && note && other.note !== note)) continue;
+        name ||= other.name; note ||= other.note; merged.push(other);
+      }
+      matching.splice(0, matching.length, ...merged);
+      prior.url = merged.reduce((a, b) => b.createdAt < a.createdAt ? b : a).url;
+    }
     if(!prior&&this.data.items.length>=20000){
       if(kind==='image'){
         const referenced=this.mediaReferencesForCapacityCleanup();
