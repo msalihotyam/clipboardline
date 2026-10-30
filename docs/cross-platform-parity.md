@@ -59,6 +59,9 @@ Turkish letters.
 selection of pinned and unpinned items to pin all of them, and to unpin only
 when every selected item is already pinned; the Library keyboard contract executes
 this on both platforms with an image, a text and a link selected.
+`trash-restore-selection` requires restoring items from Library Trash to move
+focus and selection to the first item that remains in Trash and to clear the
+details panel when none remain.
 `item-name-validation` requires Name and pin to accept a trimmed name of 1-160
 characters and at most 1024 UTF-8 bytes without control or line/paragraph
 separators, and to reject anything else with `Enter a name (1–160 characters)`.
