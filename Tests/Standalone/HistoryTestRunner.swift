@@ -579,6 +579,7 @@ enum HistoryTestRunner {
             ("testOpeningSettingsPreservesPreferencesHistoryAndSelection", settings.testOpeningSettingsPreservesPreferencesHistoryAndSelection),
             ("testSettingsBindingsApplyAppearanceWithoutMovingFocusOrDroppingHistory", settings.testSettingsBindingsApplyAppearanceWithoutMovingFocusOrDroppingHistory),
             ("testCompactMenuIdentifiesTheAppAndKeepsDailyActions", settings.testCompactMenuIdentifiesTheAppAndKeepsDailyActions),
+            ("testAddingAWatchedFolderKeepsOneThatIsCurrentlyUnavailable", settings.testAddingAWatchedFolderKeepsOneThatIsCurrentlyUnavailable),
             ("testSideRemovalUsesVisibleNewestLeftOrderAndConfirmationSnapshot", merge.testSideRemovalUsesVisibleNewestLeftOrderAndConfirmationSnapshot),
             ("testSizePersistsWithoutLosingHistoryOrThumbnailBounds", merge.testSizePersistsWithoutLosingHistoryOrThumbnailBounds),
             ("testRecordingFileTransfersPreserveMixedItemsWithoutReadingMovieBytes", merge.testRecordingFileTransfersPreserveMixedItemsWithoutReadingMovieBytes),
