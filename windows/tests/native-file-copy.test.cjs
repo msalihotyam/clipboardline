@@ -32,3 +32,15 @@ test('every native helper decodes its UTF-8 JSON stdin as UTF-8', async () => {
     jobs.dispose();
   } finally { fs.rmSync(directory, {recursive: true, force: true}); }
 });
+
+test('file copy resolves an existing file whose name is not ASCII', async () => {
+  const fs = require('node:fs');
+  if (process.platform !== 'win32') return;
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'clipboardline-utf8-copy-'));
+  try {
+    const source = path.join(directory, 'kayıt şğü.png');
+    fs.writeFileSync(source, Buffer.from('89504e470d0a1a0a', 'hex'));
+    // A mangled path made the helper's Get-Item fail, so the copy rejected as unavailable.
+    await copyFiles({files: [source]});
+  } finally { fs.rmSync(directory, {recursive: true, force: true}); }
+});
