@@ -154,6 +154,12 @@ test('folder menus create only one subfolder level and generic New folder stays 
  const f=fixture();await f.ready();const parent='20000000-0000-4000-8000-000000000001',child='20000000-0000-4000-8000-000000000002';f.state.folders=[{id:parent,name:'Parent',parentId:null},{id:child,name:'Child',parentId:parent}];f.api.emit({folders:f.state.folders});await f.ready();await f.key('KeyL');await f.click('folder-menu',{folder:child});assert.doesNotMatch(f.overlay,/data-folder-action="new-subfolder"|New subfolder/);await f.click('close-modal');await f.click('folder-scope',{folder:child});await f.click('new-folder');await f.input('simple-input','New root');await f.click('confirm-modal');assert.deepEqual(f.commands.findLast(command=>command.action==='createFolder').payload,{name:'New root',parentId:null});await f.click('folder-menu',{folder:parent});assert.match(f.overlay,/New subfolder/);await f.click('new-subfolder',{folder:parent});await f.input('simple-input','Another child');await f.click('confirm-modal');assert.deepEqual(f.commands.findLast(command=>command.action==='createFolder').payload,{name:'Another child',parentId:parent});await f.click('remove-folder',{folder:parent});assert.match(f.overlay,/Remove this folder and its subfolders\? Item content remains in the library\./);
 });
 
+test('a subfolder scope is titled with its parent like macOS',async()=>{
+ const f=fixture();await f.ready();const parent='20000000-0000-4000-8000-000000000001',child='20000000-0000-4000-8000-000000000002';
+ f.state.folders=[{id:parent,name:'Parent',parentId:null},{id:child,name:'Child',parentId:parent}];f.api.emit({folders:f.state.folders});await f.ready();await savedLibrary(f);
+ await f.click('folder-scope',{folder:parent});assert.match(f.main,/<div class="window-title"><strong>Parent<\/strong>/);await f.click('folder-scope',{folder:child});assert.match(f.main,/<div class="window-title"><strong>Parent \/ Child<\/strong>/);
+});
+
 test('removing the active folder ancestor returns Library to Saved',async()=>{
  const f=fixture();await f.ready();const parent='20000000-0000-4000-8000-000000000001',child='20000000-0000-4000-8000-000000000002';
  f.state.items[0].retainedAt=1000;f.state.items[0].folderIds=[child];f.state.folders=[{id:parent,name:'Parent',parentId:null},{id:child,name:'Child',parentId:parent}];f.api.emit({items:f.state.items,folders:f.state.folders});await f.ready();
@@ -161,6 +167,10 @@ test('removing the active folder ancestor returns Library to Saved',async()=>{
  assert.match(f.main,/data-action="scope" data-scope="saved" class="active"/);assert.deepEqual(cards(f),[f.image]);
 });
 
+test('the action list keeps Copy enabled for Trash items while editing actions are disabled',async()=>{
+ const f=fixture();await f.ready();f.state.items[0].trashedAt=1000;f.api.emit({items:f.state.items});await f.ready();await f.key('KeyL');await f.click('scope',{scope:'trash'});assert.deepEqual(cards(f),[f.image]);
+ await f.key('KeyK',{ctrl:true});assert.match(f.overlay,/data-command="copy" >/);assert.match(f.overlay,/data-command="pin" disabled>/);assert.match(f.overlay,/data-command="paste" disabled>/);assert.match(f.overlay,/data-command="preview" disabled>/);
+});
 test('restoring from Trash moves focus and selection to the first remaining item',async()=>{
  const f=fixture();await f.ready();for(const value of f.state.items.slice(0,3))value.trashedAt=1000;f.api.emit({items:f.state.items});await f.ready();await f.key('KeyL');await f.click('scope',{scope:'trash'});assert.deepEqual(cards(f),[f.image,f.text1,f.text2]);
  await f.key('ArrowRight');assert.equal(focusedCard(f),f.text1);await f.click('restore');assert.deepEqual(cards(f),[f.image,f.text2]);assert.equal(focusedCard(f),f.image);assert.match(f.main,/<article class="[^"]*\bselected\b[^"]*"[^>]*data-item-id="00000000-0000-4000-8000-000000000001"/);
