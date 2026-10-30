@@ -64,6 +64,9 @@ zero-width joiner and non-joiner (emoji sequences, Persian words) while removing
 the bidirectional embeddings, overrides and isolates that can spoof a title,
 whether written directly or as numeric references; numeric references to control
 code points stay literal.
+`trash-restore-selection` requires restoring items from Library Trash to move
+focus and selection to the first item that remains in Trash and to clear the
+details panel when none remain.
 
 The adapters execute application behavior:
 
