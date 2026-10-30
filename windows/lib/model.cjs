@@ -352,6 +352,7 @@ class Store {
       item.folderIds = [...new Set(matching.flatMap(i => i.folderIds))]; item.tags = [...new Set(matching.flatMap(i => i.tags))];
       item.name ||= matching.find(i => i.name)?.name || '';
       item.note ||= matching.find(i => i.note)?.note || '';
+      for(const key of ['title','author','thumbnailFile'])if(!item[key]){const from=matching.find(i=>i[key]);if(from)item[key]=from[key];}
       const dates=matching.map(i=>i.retainedAt).filter(Number.isFinite);if(dates.length)item.retainedAt=Math.min(...dates);
       const copied=matching.map(i=>i.lastCopiedAt).filter(Number.isFinite);if(copied.length)item.lastCopiedAt=Math.max(...copied);
     }

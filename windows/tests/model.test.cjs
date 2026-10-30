@@ -176,10 +176,11 @@ test('links differing only by tracking parameters share one item like macOS Link
 }));
 test('old duplicate links that differ only by tracking parameters merge on the next copy and keep the first stored address, names and notes',()=>fixture((s,time)=>{
  const old=(url,createdAt,fields)=>Object.assign(s.insert('link','https://example.com/seed-'+s.data.items.length),{url,createdAt,updatedAt:createdAt,...fields});
- const first=old('https://example.com/a?utm_source=x',1000,{name:'Reading list',pinned:true}),second=old('https://example.com/a',2000,{note:'from a friend',tags:['later'],lastCopiedAt:4000}),newest=old('https://example.com/a?fbclid=z',3000,{});
+ const first=old('https://example.com/a?utm_source=x',1000,{name:'Reading list',pinned:true,title:'Example',author:'Ann',thumbnailFile:'a'.repeat(64)+'.png'}),second=old('https://example.com/a',2000,{note:'from a friend',tags:['later'],lastCopiedAt:4000}),newest=old('https://example.com/a?fbclid=z',3000,{});
  time(5000);const copy=s.insert('link','https://example.com/a?gclid=q');
  assert.equal(copy.id,newest.id);assert.deepEqual(s.data.items.filter(i=>i.kind==='link').map(i=>i.id),[newest.id]);
  assert.equal(copy.url,first.url);assert.equal(copy.name,'Reading list');assert.equal(copy.note,'from a friend');assert.deepEqual(copy.tags,['later']);assert.equal(copy.pinned,true);assert.equal(copy.lastCopiedAt,4000);
+ assert.equal(copy.title,'Example');assert.equal(copy.author,'Ann');assert.equal(copy.thumbnailFile,'a'.repeat(64)+'.png');
 }));
 test('old duplicate links whose names or notes differ are not merged, so none of them is lost',()=>fixture((s,time)=>{
  const old=(url,createdAt,fields)=>Object.assign(s.insert('link','https://example.com/seed-'+s.data.items.length),{url,createdAt,updatedAt:createdAt,...fields});
