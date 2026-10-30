@@ -174,3 +174,8 @@ test('links differing only by tracking parameters share one item like macOS Link
  assert.notEqual(s.insert('link','https://example.com/a?id=8').id,first.id);assert.notEqual(s.insert('link','https://example.com/a?id=7&ref=x').id,first.id);assert.notEqual(s.insert('link','https://example.com/a?id=7#top').id,first.id);
  assert.equal(s.insert('link','https://example.com/?utm_source=x').id,s.insert('link','https://example.com/').id);assert.equal(s.data.items.length,5);
 }));
+test('pin on a mixed selection pins every item and only a fully pinned selection unpins like macOS',()=>fixture(s=>{
+ const a=s.insert('text','first pin'),b=s.insert('text','second pin'),pinned=()=>[a,b].map(value=>s.item(value.id).pinned);
+ s.modify('pin',{ids:[a.id]});s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[true,true]);
+ s.modify('pin',{ids:[a.id,b.id]});assert.deepEqual(pinned(),[false,false]);
+}));
