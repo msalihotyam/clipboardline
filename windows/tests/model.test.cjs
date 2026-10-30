@@ -149,7 +149,7 @@ test('selection lookups keep request order and reject missing items',()=>fixture
 }));
 test('Name and pin follows macOS nameAndPin: 1-160 characters, 1024 bytes, no control or line separators',()=>fixture(s=>{
  const id=s.insert('text','Synthetic text').id,family='\u{1F468}‍\u{1F469}‍\u{1F467}‍\u{1F466}';
- for(const name of ['',' \n ','x'.repeat(161),'a\nb','a\u0007b','a b','a b','\u{1F600}'.repeat(161),family.repeat(41)])assert.throws(()=>s.modify('name',{id,name}),/Enter a name/);
+ for(const name of ['',' \n ','x'.repeat(161),'a\nb','a\u0007b','a b','a b','\u{1F600}'.repeat(161),family.repeat(41),'x'.repeat(4097),'a\0b',undefined,42])assert.throws(()=>s.modify('name',{id,name}),/Enter a name/);
  assert.equal(s.item(id).pinned,false);assert.equal(s.item(id).name,'');
  s.modify('name',{id,name:'  '+'é'.repeat(80)+'  '});assert.equal(s.item(id).name,'é'.repeat(80));assert.equal(s.item(id).pinned,true);
  s.modify('name',{id,name:'x'.repeat(160)});s.modify('name',{id,name:'\u{1F600}'.repeat(160)});assert.equal(s.item(id).name.length,320);

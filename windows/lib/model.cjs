@@ -92,7 +92,7 @@ const TAG_INPUT_LIMIT=4096;
 const validTagName=name=>!/[\p{Cc}\p{Cf}]/u.test(name)&&[...graphemes.segment(name)].length<=64;
 // Match macOS nameAndPin: 1-160 Characters, at most 1024 UTF-8 bytes, and no
 // control, line or paragraph separator characters.
-function itemName(value){const name=text(value,TAG_INPUT_LIMIT,true).trim();if(!name||[...graphemes.segment(name)].length>160||Buffer.byteLength(name)>1024||/[\p{Cc}\p{Zl}\p{Zp}]/u.test(name))fail('Enter a name (1–160 characters)');return name;}
+function itemName(value){let name='';try{name=text(value,TAG_INPUT_LIMIT,true).trim();}catch{}if(!name||[...graphemes.segment(name)].length>160||Buffer.byteLength(name)>1024||/[\p{Cc}\p{Zl}\p{Zp}]/u.test(name))fail('Enter a name (1–160 characters)');return name;}
 function saved(item) { return item.retainedAt != null || item.pinned || item.folderIds.length > 0 || item.tags.length > 0; }
 // Match macOS LinkIdentity.standalone: a copied URL keeps its link identity
 // when the source adds a trailing newline or surrounding spaces.
