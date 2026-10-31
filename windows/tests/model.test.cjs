@@ -177,6 +177,7 @@ test('Name and pin follows macOS nameAndPin: 1-160 characters, 1024 bytes, no co
  assert.equal(s.item(id).pinned,false);assert.equal(s.item(id).name,'');
  s.modify('name',{id,name:'  '+'é'.repeat(80)+'  '});assert.equal(s.item(id).name,'é'.repeat(80));assert.equal(s.item(id).pinned,true);
  s.modify('name',{id,name:'x'.repeat(160)});s.modify('name',{id,name:'\u{1F600}'.repeat(160)});assert.equal(s.item(id).name.length,320);
+ s.modify('name',{id,name:' '.repeat(4096)+'Padded'+' '.repeat(8)});assert.equal(s.item(id).name,'Padded');
 }));
 test('link preview metadata stores its thumbnail only while the link still exists',()=>fixture((s,time,dir)=>{
  const files=()=>fs.readdirSync(path.join(dir,'media')),url='https://example.com/a';
