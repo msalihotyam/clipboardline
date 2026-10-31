@@ -75,6 +75,11 @@ import XCTest
         wait { model.query.tagIDs.isEmpty && !model.loading }
         XCTAssertEqual(model.ids, [note.id])
     }
+    func testTextCopiedWithWindowsLineEndingsIsTitledByItsFirstLine() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
+        let note = try XCTUnwrap(store.captureText("Shopping list\r\nmilk\r\nbread"))
+        XCTAssertEqual(note.displayTitle, "Shopping list")
+    }
     func testNativeSearchEscapeRoutesImmediateSelectAllToCollectionAndLeavesOtherEditorsAlone() throws {
         _ = NSApplication.shared
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
@@ -208,6 +213,23 @@ import XCTest
         XCTAssertEqual(model.title, "Parent / Middle / Child")
         model.changeScope(.collection(middle)); wait { model.query.scope == .collection(middle) && !model.loading }
         XCTAssertEqual(model.title, "Parent / Middle")
+    }
+    func testRemovingAnotherFolderKeepsTheOpenViewLikeWindows() throws {
+        let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
+        let keep = try store.createCollection("Keep"), other = try store.createCollection("Other")
+        let parent = try store.createCollection("Parent"), child = try store.createCollection("Child", parent: parent)
+        let first = try XCTUnwrap(store.captureText("first kept note")), second = try XCTUnwrap(store.captureText("second kept note")); try store.assign([first.id, second.id], to: keep)
+        let model = LibraryModel(store: store)
+        wait { model.collections.count == 4 && !model.loading }
+        model.changeScope(.collection(keep)); wait { model.query.scope == .collection(keep) && model.ids.count == 2 && !model.loading }
+        let chosen = model.ids[1]; _ = model.select(chosen)
+        model.removeFolder(other); wait { model.collections.count == 3 && !model.loading }
+        XCTAssertEqual(model.query.scope, .collection(keep))
+        XCTAssertEqual(model.selectedIDs, [chosen]); XCTAssertEqual(model.focusedID, chosen)
+        model.changeScope(.collection(child)); wait { model.query.scope == .collection(child) && !model.loading }
+        model.removeFolder(parent); wait { model.collections.count == 1 && model.query.scope == .saved && !model.loading }
+        model.changeScope(.collection(keep)); wait { model.query.scope == .collection(keep) && !model.loading }
+        model.removeFolder(keep); wait { model.collections.isEmpty && model.query.scope == .saved && !model.loading }
     }
     func testRestoringFromTrashSelectsTheFirstRemainingItemLikeWindows() throws {
         let f = try SyntheticFixture(); defer { f.cleanup() }; let store = try library(f)
