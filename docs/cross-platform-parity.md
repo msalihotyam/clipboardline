@@ -67,6 +67,8 @@ details panel when none remain.
 `trash-copy` requires the Copy action to stay enabled for an item in Library
 Trash, as the copy shortcut already works there, while editing actions wait for
 Restore.
+`item-name-trimming` requires an item name to be used without surrounding
+whitespace and a whitespace-only name to count as no name.
 `unavailable-watched-folder` requires a watched folder that is unavailable, such as one on an
 unmounted volume, to stay in the saved list while it is skipped, so adding or removing another
 watched folder does not forget it.

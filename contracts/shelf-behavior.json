@@ -72,6 +72,12 @@
         "windows": "actionCommands() in renderer.js leaves copy out of the actions disabled for Trash items; library-ui.test.cjs checks the action list in Trash."
       },
       {
+        "id": "item-name-trimming",
+        "behavior": "An item name is used without its surrounding whitespace, and a name that is only whitespace counts as no name, so the card, the title ordering and the search index fall back to the item's content instead of showing a blank title.",
+        "macos": "LibraryRecord.displayTitle trims the stored title and ignores a blank one; LibraryStoreTests.testBlankOrPaddedItemNameIsIgnoredOrTrimmedLikeWindows covers it.",
+        "windows": "The details command stores the name trimmed and title() falls back to the content for an empty name; model.test.cjs covers a blank and a padded name."
+      },
+      {
         "id": "unavailable-watched-folder",
         "behavior": "A watched folder that is unavailable (for example on an unmounted volume) is skipped while watching but stays in the saved list, so adding or removing another watched folder does not forget it.",
         "macos": "AppDelegate.extraFolders returns every saved folder and existingExtraFolders is the subset that is watched; SettingsTests.testAddingAWatchedFolderKeepsOneThatIsCurrentlyUnavailable covers it.",
