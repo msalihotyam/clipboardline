@@ -72,6 +72,10 @@ Restore.
 whitespace and a whitespace-only name to count as no name.
 `folder-removal-view` requires removing a folder to return the Library to My
 library only when the open view is that folder or one of its subfolders.
+`item-display-title` requires an unnamed text to be titled by its first non-blank
+line, trimmed and capped at 120 grapheme clusters (Untitled note when every line is
+blank), and a link without a fetched title by its host name (Link when the stored URL
+does not parse).
 `unavailable-watched-folder` requires a watched folder that is unavailable, such as one on an
 unmounted volume, to stay in the saved list while it is skipped, so adding or removing another
 watched folder does not forget it.
