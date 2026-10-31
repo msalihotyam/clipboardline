@@ -59,8 +59,9 @@ Turkish letters.
 selection of pinned and unpinned items to pin all of them, and to unpin only
 when every selected item is already pinned; the Library keyboard contract executes
 this on both platforms with an image, a text and a link selected.
-`subfolder-title` requires the Library title of a subfolder to read
-`Parent / Child`, so same-named subfolders can be told apart.
+`subfolder-title` requires the Library title of a subfolder to list every
+ancestor, outermost first (`Parent / Child`, `Parent / Middle / Child`), so
+same-named subfolders of different parents can be told apart.
 `trash-restore-selection` requires restoring items from Library Trash to move
 focus and selection to the first item that remains in Trash and to clear the
 details panel when none remain.
@@ -69,6 +70,8 @@ Trash, as the copy shortcut already works there, while editing actions wait for
 Restore.
 `item-name-trimming` requires an item name to be used without surrounding
 whitespace and a whitespace-only name to count as no name.
+`folder-removal-view` requires removing a folder to return the Library to My
+library only when the open view is that folder or one of its subfolders.
 `item-name-validation` requires Name and pin to accept a trimmed name of 1-160
 characters and at most 1024 UTF-8 bytes without control or line/paragraph
 separators, and to reject anything else with `Enter a name (1–160 characters)`.
