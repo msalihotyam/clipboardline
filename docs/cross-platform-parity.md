@@ -67,6 +67,8 @@ details panel when none remain.
 `trash-copy` requires the Copy action to stay enabled for an item in Library
 Trash, as the copy shortcut already works there, while editing actions wait for
 Restore.
+`item-name-trimming` requires an item name to be used without surrounding
+whitespace and a whitespace-only name to count as no name.
 `item-name-validation` requires Name and pin to accept a trimmed name of 1-160
 characters and at most 1024 UTF-8 bytes without control or line/paragraph
 separators, and to reject anything else with `Enter a name (1–160 characters)`.
